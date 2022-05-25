@@ -106,7 +106,7 @@ const gridOptions =  () => ({
   sideBar: true,
   suppressMenuHide: true,
   enableRangeSelection: true,
-  enableCharts: true,
+  suppressReactUi: true
 });
 
 // build the AdaptableOptions object
@@ -115,9 +115,12 @@ const adaptableOptions = (): AdaptableOptions => ({
   primaryKey: 'id',
   userName: 'sandbox user',
   licenseKey: process.env.REACT_APP_ADAPTABLE_LICENSE_KEY,
-  adaptableId: 'adaptable react demo',
+  adaptableId: 'adaptable react demo'+Math.random(),
   dashboardOptions: {
     customToolbars: [],
+  },
+  containerOptions: {
+    adaptableContainer: "adaptable"+Math.random()
   },
   predefinedConfig: {
     Dashboard: {
@@ -139,32 +142,45 @@ const modules = [...AllEnterpriseModules];
 
 const App: React.FC = () => {
   const [show, setShow] = React.useState<boolean>(true);
+  const [number, setNumber] = React.useState(1);
 
+ let components= [];
+ for(let i=0; i< number; i++){
+  const aOptions = adaptableOptions();
   const gOptions = gridOptions();
+  components.push({ aOptions, gOptions});
+ }
+
   return (
-    <div style={{ display: 'flex', flexFlow: 'column', height: '100vh' }}>
-      <div style={{ marginBottom: 20 }}>
-        <button onClick={() => setShow(true)}>
-          Show
-        </button>
-        <button onClick={() => setShow(false)}>
-          Hide
-        </button>
-      </div>
-      {show && <Fragment>
-      <AdaptableReact
-        style={{ flex: 'none' }}
-        gridOptions={gOptions}
-        adaptableOptions={adaptableOptions()}
-        modules={modules}
-      />
-      <div className="ag-theme-alpine" style={{ flex: 1 }}>
-        <AgGridReact gridOptions={gOptions} modules={modules} />
-      </div>
-      </Fragment>
-    }
+    <>
+    <div style={{ marginBottom: 20 }}>
+      <button onClick={() => setShow(true)}>
+        Show
+      </button>
+      <button onClick={() => setShow(false)}>
+        Hide
+      </button>
+      <input value={number} onChange={e => setNumber(parseInt(e.target.value))} />
     </div>
-  );
+    {show && <Fragment>
+      {
+        components.map(({aOptions, gOptions }) => (
+          <div id={aOptions.adaptableId} style={{ display: 'flex', flexFlow: 'column', height: '100vh' }}>
+          <AdaptableReact
+            style={{ flex: 'none' }}
+            gridOptions={gOptions}
+            adaptableOptions={aOptions}
+            modules={modules}
+          />
+          <div className="ag-theme-alpine" style={{ flex: 1 }}>
+            <AgGridReact gridOptions={gOptions} modules={modules} />
+          </div>
+        </div>
+        ))
+        }
+    </Fragment>
+  }
+  </>);
 };
 
 export default App;
