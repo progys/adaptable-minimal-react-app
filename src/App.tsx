@@ -24,6 +24,7 @@ import '@ag-grid-community/all-modules/dist/styles/ag-theme-alpine-dark.css';
 import {
   AllEnterpriseModules
 } from '@ag-grid-enterprise/all-modules';
+import {GridOptions} from "@ag-grid-community/all-modules";
 
 // create ag-Grid Column Definitions
 const columnDefs = () => [
@@ -34,6 +35,7 @@ const columnDefs = () => [
     filter: true,
     sortable: true,
     type: 'abColDefString',
+    floatingFilter: true,
   },
   {
     headerName: 'Model',
@@ -42,6 +44,7 @@ const columnDefs = () => [
     filter: true,
     sortable: true,
     type: 'abColDefString',
+    floatingFilter: true,
   },
   {
     headerName: 'Price',
@@ -60,7 +63,7 @@ const columnDefs = () => [
   },
 ];
 // some dummy data
-const rowData = [
+const rowData =()=>  [
   { id: 1, make: 'Toyota', model: 'Celica', price: 35000, date: '2010-01-02' },
   { id: 2, make: 'Ford', model: 'Mondeo', price: 32000, date: '2012-01-02' },
   { id: 3, make: 'Ford', model: 'Fiesta', price: 22000, date: '2014-01-02' },
@@ -92,21 +95,27 @@ const rowData = [
 ];
 
 // let ag-grid know which columns and what data to use and add some other properties
-const gridOptions =  () => ({
+const gridOptions =  ():GridOptions => ({
   defaultColDef: {
     enablePivot: true,
     enableRowGroup: true,
     enableValue: true,
   },
   columnDefs: columnDefs(),
-  rowData: rowData,
-  components: {
-    AdaptableToolPanel: AdaptableToolPanelAgGridComponent,
-  },
+  rowData: rowData(),
   sideBar: true,
   suppressMenuHide: true,
   enableRangeSelection: true,
-  suppressReactUi: true
+  suppressReactUi: true,
+  statusBar:{
+    statusPanels:[
+      {
+        key: 'Left Panel',
+        statusPanel: 'AdaptableStatusPanel',
+        align: 'left',
+      },
+    ]
+  }
 });
 
 // build the AdaptableOptions object
@@ -116,6 +125,9 @@ const adaptableOptions = (): AdaptableOptions => ({
   userName: 'sandbox user',
   licenseKey: process.env.REACT_APP_ADAPTABLE_LICENSE_KEY,
   adaptableId: 'adaptable react demo'+Math.random(),
+  notificationsOptions:{
+    duration:'always'
+  },
   dashboardOptions: {
     customToolbars: [],
   },
@@ -134,6 +146,14 @@ const adaptableOptions = (): AdaptableOptions => ({
     ToolPanel: {
       Revision: Date.now(),
     },
+    StatusBar:{
+      StatusBars:[
+        {
+          Key:'Left Panel',
+          StatusBarPanels:["ConditionalStyle",'Alert']
+        }
+      ]
+    }
   },
   plugins: [],
 });
@@ -150,6 +170,8 @@ const App: React.FC = () => {
   const gOptions = gridOptions();
   components.push({ aOptions, gOptions});
  }
+
+ console.log('re-rendering')
 
   return (
     <>
